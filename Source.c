@@ -1,7 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-// Function to print the contents of the file
+// запись в файл
 void printFile(const char* filename) {
     FILE* file = fopen(filename, "rb");
     if (!file) {
@@ -17,7 +17,7 @@ void printFile(const char* filename) {
     fclose(file);
 }
 
-// Function to search for a number in the file
+// поиск цифры в ффайле
 void findNumber(const char* filename, int target) {
     FILE* file = fopen(filename, "rb");
     if (!file) {
@@ -41,7 +41,7 @@ void findNumber(const char* filename, int target) {
     fclose(file);
 }
 
-// Function to swap two numbers in the file
+// свап двух цифр в файле
 void swapNumbers(const char* filename, int pos1, int pos2) {
     FILE* file = fopen(filename, "r+b");
     if (!file) {
@@ -69,7 +69,8 @@ void swapNumbers(const char* filename, int pos1, int pos2) {
     fclose(file);
 }
 
-// Function to count unique numbers in the file
+// сколько уникальных цифр в файле
+
 int countUniqueNumbers(const char* filename) {
     FILE* file = fopen(filename, "rb");
     if (!file) {
@@ -93,8 +94,6 @@ int countUniqueNumbers(const char* filename) {
     fclose(file);
     return count;
 }
-
-// Function to insert a number into the file while maintaining order
 void insertNumber(const char* filename, int num) {
     FILE* file = fopen(filename, "r+b");
     if (!file) {
@@ -124,14 +123,14 @@ void insertNumber(const char* filename, int num) {
         end -= sizeof(int);
     }
 
-    // Insert the new number
+    
     fseek(file, pos * sizeof(int), SEEK_SET);
     fwrite(&num, sizeof(int), 1, file);
 
     fclose(file);
 }
 
-// Function to reverse the elements in the file
+// реверс элементов в файле
 void reverseFile(const char* filename) {
     FILE* file = fopen(filename, "r+b");
     if (!file) {
@@ -145,15 +144,15 @@ void reverseFile(const char* filename) {
     long left = 0, right = size / sizeof(int) - 1;
 
     while (left < right) {
-        // Read the left element
+        //read the left element
         fseek(file, left * sizeof(int), SEEK_SET);
         fread(&num1, sizeof(int), 1, file);
 
-        // Read the right element
+        //   read the right element
         fseek(file, right * sizeof(int), SEEK_SET);
         fread(&num2, sizeof(int), 1, file);
 
-        // Swap the elements
+    // swap
         fseek(file, left * sizeof(int), SEEK_SET);
         fwrite(&num2, sizeof(int), 1, file);
 
@@ -174,8 +173,8 @@ int main(int argc, char* argv[]) {
     }
 
     const char* filename = argv[1];
-
-    // Write numbers to the file
+ 
+// write numbers to the file
     FILE* file = fopen(filename, "wb");
     if (!file) {
         perror("Error creating file");
@@ -189,17 +188,16 @@ int main(int argc, char* argv[]) {
     }
     fclose(file);
 
-    // Print the contents of the file
+
     printf("File contents:\n");
     printFile(filename);
-
-    // Search for a number in the file
+// search 
     int target;
     printf("Enter a number to search: ");
     scanf_s("%d", &target);
     findNumber(filename, target);
 
-    // Swap elements
+// swap
     int pos1, pos2;
     printf("Enter positions to swap (starting from 0): ");
     scanf_s("%d %d", &pos1, &pos2);
@@ -207,11 +205,13 @@ int main(int argc, char* argv[]) {
     printf("File contents after swapping:\n");
     printFile(filename);
 
-    // Count unique numbers
+
+
+
     int uniqueCount = countUniqueNumbers(filename);
     printf("Number of unique numbers: %d\n", uniqueCount);
 
-    // Insert a number into the file
+//Insert
     int newNum;
     printf("Enter a number to insert: ");
     scanf_s("%d", &newNum);
@@ -219,7 +219,7 @@ int main(int argc, char* argv[]) {
     printf("File contents after insertion:\n");
     printFile(filename);
 
-    // Reverse the file
+//reverss
     reverseFile(filename);
     printf("File contents after reversing:\n");
     printFile(filename);
