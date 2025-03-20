@@ -1,7 +1,70 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-// РІС‹РІРѕР¶ С„Р°Р№Р»Р°
+void printFile();
+void printEvenFile();
+
+int main(int argc, char* argv[]) {
+	if (argc < 2) {
+		printf("Usage: % s <filename>\n", argv[0]);
+		return 1;
+	}
+	const char* filename = argv[1];
+
+    //открытие файла 
+    FILE* file = fopen(filename, "w");
+    if (!file) {
+        perror(" Error creating file");
+        return 1;
+    }
+    //заполнение тексового файла целыми числами
+    printf("vvodite celie chisla dlia zapisi v tekstovi fail(0 dlia zavershenia zapisi)");
+    int num;
+    while (1) {
+        int num = fputs(&num, filename);
+;        
+        fwrite(&num, sizeof(int), 1, filename);
+    }
+    fclose(filename);
+    //вывод содержимого файла на экран
+    printf("soderzhimoe faila");
+    printFile(filename);
+    //вывод на экран всех четных элементов файла
+    printEvenFile(filename);
+
+
+}
+
+
+
+
+
+
+
+
+
+// Функция для безопасного ввода числа safeInput
+int safeInput() {
+    char buffer[100]; // Буфер для хранения ввода
+    int num;
+
+    while (1) {
+        printf("Enter a number (0 to finish): ");
+        if (fgets(buffer, sizeof(buffer), stdin) != NULL) {
+            // Пытаемся преобразовать строку в число
+            if (sscanf_s(buffer, "%d", &num) == 1) {
+                return num; // Успешный ввод числа
+            }
+            else {
+                printf("Invalid input. Please enter an integer.\n");
+            }
+        }
+        else {
+            printf("Input error. Please try again.\n");
+        }
+    }
+}
+//функция для вывода файла 
 void printFile(const char* filename) {
     FILE* file = fopen(filename, "rb");
     if (!file) {
@@ -16,147 +79,20 @@ void printFile(const char* filename) {
     printf("\n");
     fclose(file);
 }
-
-// РїРѕРґСЃС‡РµС‚ СѓРЅРёРєР°Р»СЊРЅС‹С… С‡РёСЃРµР»
-int countUniqueNumbers(const char* filename) {
+//функция для вывода четных элементов массива
+void printEvenFile(const char* filename) {
     FILE* file = fopen(filename, "rb");
     if (!file) {
         perror("Error opening file");
-        return -1;
-    }
-
-    int prev, current;
-    int count = 0;
-
-    if (fread(&prev, sizeof(int), 1, file) == 1) {
-        count = 1;
-        while (fread(&current, sizeof(int), 1, file) == 1) {
-            if (current != prev) {
-                count++;
-                prev = current;
-            }
-        }
-    }
-
-    fclose(file);
-    return count;
-}
-
-// РІСЃС‚Р°РІРєР° СЃ СЃРѕС…СЂР°РЅРµРЅРёРµРј РїРѕСЂСЏРґРєР°
-void insertNumber(const char* filename, int num) {
-    FILE* file = fopen(filename, "r+b");
-    if (!file) {
-        perror("Error opening file");
         return;
     }
-
-    int current;
-    long pos = 0;
-
-
-    while (fread(&current, sizeof(int), 1, file) == 1) {
-        if (current < num) {
-            break;
+    printf("Chetnie elementi faila");
+    int EvenNum;
+    while (fread(&EvenNum, sizeof(int), 1, file) == 1) {
+        if (EvenNum % 2 == 0) {
+            printf("d", EvenNum);
         }
-        pos++;
     }
-
-    // СЃРґРІРёРі
-    fseek(file, 0, SEEK_END);
-    long end = ftell(file);
-    while (end > pos * sizeof(int)) {
-        fseek(file, end - sizeof(int), SEEK_SET);
-        fread(&current, sizeof(int), 1, file);
-        fseek(file, end, SEEK_SET);
-        fwrite(&current, sizeof(int), 1, file);
-        end -= sizeof(int);
-    }
-
-    // РІСЃС‚Р°РІРєР° 
-    fseek(file, pos * sizeof(int), SEEK_SET);
-    fwrite(&num, sizeof(int), 1, file);
-
+    printf("\n");
     fclose(file);
-}
-
-// СЂРµРІРµСЂСЃ СЌР»РµРјРµРЅС‚РѕРІ РІ С„Р°Р№Р»Рµ
-void reverseFile(const char* filename) {
-    FILE* file = fopen(filename, "r+b");
-    if (!file) {
-        perror("Error opening file");
-        return;
-    }
-
-    fseek(file, 0, SEEK_END);
-    long size = ftell(file);
-    int num1, num2;
-    long left = 0, right = size / sizeof(int) - 1;
-
-    while (left < right) {
-        // Р»РµРІС‹Р№ СЌР»РµРјРµРЅС‚
-        fseek(file, left * sizeof(int), SEEK_SET);
-        fread(&num1, sizeof(int), 1, file);
-
-        //РїСЂР°РІС‹Р№ СЌР»РµРјРµРЅС‚
-        fseek(file, right * sizeof(int), SEEK_SET);
-        fread(&num2, sizeof(int), 1, file);
-
-        // СЃРІР°Рї
-        fseek(file, left * sizeof(int), SEEK_SET);
-        fwrite(&num2, sizeof(int), 1, file);
-
-        fseek(file, right * sizeof(int), SEEK_SET);
-        fwrite(&num1, sizeof(int), 1, file);
-
-        left++;
-        right--;
-    }
-
-    fclose(file);
-}
-
-int main(int argc, char* argv[]) {
-    if (argc < 2) {
-        printf("Usage: %s <filename>\n", argv[0]);
-        return 1;
-    }
-
-    const char* filename = argv[1];
-
-    // Р·Р°РїРёСЃСЊ РІ С„Р°Р№Р»
-    FILE* file = fopen(filename, "wb");
-    if (!file) {
-        perror("Error creating file");
-        return 1;
-    }
-
-    int num;
-    printf("Enter integers in non-increasing order (enter 0 to finish):\n");
-    while (scanf_s("%d", &num) == 1 && num != 0) {
-        fwrite(&num, sizeof(int), 1, file);
-    }
-    fclose(file);
-
- // РІС‹РІРѕРґ
-    printf("File contents:\n");
-    printFile(filename);
-
-   // РєРѕР» РІРѕ СѓРЅРёРєР°Р»СЊРЅС‹С… С‡РёСЃРµР»
-    int uniqueCount = countUniqueNumbers(filename);
-    printf("Number of unique numbers: %d\n", uniqueCount);
-
- // Р·Р°РїРёСЃСЊ РґРѕРї С‡РёСЃРµР» РІ С„Р°Р№Р»
-    printf("Enter additional numbers (enter 0 to finish):\n");
-    while (scanf_s("%d", &num) == 1 && num != 0) {
-        insertNumber(filename, num);
-    }
-    printf("File contents after insertion:\n");
-    printFile(filename);
-
- // СЂРµРІРµСЂСЃ
-    reverseFile(filename);
-    printf("File contents after reversing:\n");
-    printFile(filename);
-
-    return 0;
 }
