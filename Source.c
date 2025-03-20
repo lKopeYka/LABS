@@ -3,96 +3,122 @@
 
 void printFile();
 void printEvenFile();
+int safeInput();
+void multiply();
 
 int main(int argc, char* argv[]) {
-	if (argc < 2) {
-		printf("Usage: % s <filename>\n", argv[0]);
-		return 1;
-	}
-	const char* filename = argv[1];
-
-    //открытие файла 
-    FILE* file = fopen(filename, "w");
-    if (!file) {
-        perror(" Error creating file");
+    if (argc < 2) {
+        printf("Usage: %s <filename>\n", argv[0]);
         return 1;
     }
-    //заполнение тексового файла целыми числами
-    printf("vvodite celie chisla dlia zapisi v tekstovi fail(0 dlia zavershenia zapisi)");
+    const char* filename = argv[1];
+
+    
+    FILE* file = fopen(filename, "w");
+    if (!file) {
+        perror("Error creating file");
+        return 1;
+    }
+
+    printf("Р’РІРѕРґРёС‚Рµ С†РµР»С‹Рµ С‡РёСЃР»Р° РґР»СЏ Р·Р°РїРёСЃРё РІ С‚РµРєСЃС‚РѕРІС‹Р№ С„Р°Р№Р» (0 РґР»СЏ Р·Р°РІРµСЂС€РµРЅРёСЏ Р·Р°РїРёСЃРё):\n");
     int num;
     while (1) {
-        int num = fputs(&num, filename);
-;        
-        fwrite(&num, sizeof(int), 1, filename);
+        num = safeInput();
+        if (num == 0) {
+            break;
+        }
+        fprintf(file, "%d\n", num);
     }
-    fclose(filename);
-    //вывод содержимого файла на экран
-    printf("soderzhimoe faila");
+    fclose(file);
+
+    // РІС‹РІРѕРґ 
+    printf("РЎРѕРґРµСЂР¶РёРјРѕРµ С„Р°Р№Р»Р°:\n");
     printFile(filename);
-    //вывод на экран всех четных элементов файла
+    printf("Р§РµС‚РЅС‹Рµ СЌР»РµРјРµРЅС‚С‹ С„Р°Р№Р»Р°:\n");
     printEvenFile(filename);
+    multiply(filename, "multiplication_result.txt");
 
-
+    return 0;
 }
 
-
-
-
-
-
-
-
-
-// Функция для безопасного ввода числа safeInput
 int safeInput() {
-    char buffer[100]; // Буфер для хранения ввода
+    char buffer[100];
     int num;
 
     while (1) {
-        printf("Enter a number (0 to finish): ");
+        printf("Р’РІРµРґРёС‚Рµ С‡РёСЃР»Рѕ (0 РґР»СЏ Р·Р°РІРµСЂС€РµРЅРёСЏ): ");
         if (fgets(buffer, sizeof(buffer), stdin) != NULL) {
-            // Пытаемся преобразовать строку в число
-            if (sscanf_s(buffer, "%d", &num) == 1) {
-                return num; // Успешный ввод числа
+              if (sscanf_s(buffer, "%d", &num) == 1) {
+                return num; 
             }
             else {
-                printf("Invalid input. Please enter an integer.\n");
+                printf("РќРµРІРµСЂРЅС‹Р№ РІРІРѕРґ. РџРѕР¶Р°Р»СѓР№СЃС‚Р°, РІРІРµРґРёС‚Рµ С†РµР»РѕРµ С‡РёСЃР»Рѕ.\n");
             }
         }
         else {
-            printf("Input error. Please try again.\n");
+            printf("РћС€РёР±РєР° РІРІРѕРґР°. РџРѕР¶Р°Р»СѓР№СЃС‚Р°, РїРѕРїСЂРѕР±СѓР№С‚Рµ СЃРЅРѕРІР°.\n");
         }
     }
 }
-//функция для вывода файла 
+
 void printFile(const char* filename) {
-    FILE* file = fopen(filename, "rb");
+    FILE* file = fopen(filename, "r");
     if (!file) {
-        perror("Error opening file");
+        perror("РћС€РёР±РєР° РѕС‚РєСЂС‹С‚РёСЏ С„Р°Р№Р»Р°");
         return;
     }
 
     int num;
-    while (fread(&num, sizeof(int), 1, file) == 1) {
+    while (fscanf_s(file, "%d", &num) == 1) {
         printf("%d ", num);
     }
     printf("\n");
     fclose(file);
 }
-//функция для вывода четных элементов массива
+
 void printEvenFile(const char* filename) {
-    FILE* file = fopen(filename, "rb");
+    FILE* file = fopen(filename, "r");
     if (!file) {
-        perror("Error opening file");
+        perror("РћС€РёР±РєР° РѕС‚РєСЂС‹С‚РёСЏ С„Р°Р№Р»Р°");
         return;
     }
-    printf("Chetnie elementi faila");
-    int EvenNum;
-    while (fread(&EvenNum, sizeof(int), 1, file) == 1) {
-        if (EvenNum % 2 == 0) {
-            printf("d", EvenNum);
+
+    int num;
+    while (fscanf_s(file, "%d", &num) == 1) {
+        if (num % 2 == 0) {
+            printf("%d ", num);
         }
     }
     printf("\n");
     fclose(file);
+}
+
+void multiply(const char* inputFilename, const char* outputFilename) {
+    FILE* inputFile = fopen(inputFilename, "r");
+    if (!inputFile) {
+        perror("РћС€РёР±РєР° РѕС‚РєСЂС‹С‚РёСЏ РёСЃС…РѕРґРЅРѕРіРѕ С„Р°Р№Р»Р°");
+        return;
+    }
+
+    int num1, num2;
+    if (fscanf_s(inputFile, "%d", &num1) != 1 || fscanf_s(inputFile, "%d", &num2) != 1) {
+        printf("Р’ С„Р°Р№Р»Рµ РґРѕР»Р¶РЅРѕ Р±С‹С‚СЊ РєР°Рє РјРёРЅРёРјСѓРј РґРІР° С‡РёСЃР»Р°.\n");
+        fclose(inputFile);
+        return;
+    }
+    fclose(inputFile);
+
+    FILE* outputFile = fopen(outputFilename, "w");
+    if (!outputFile) {
+        perror("РћС€РёР±РєР° СЃРѕР·РґР°РЅРёСЏ С„Р°Р№Р»Р° РґР»СЏ СЂРµР·СѓР»СЊС‚Р°С‚Р°");
+        return;
+    }
+
+    // РѕС„РѕСЂРјР»РµРЅРёРµ Р·Р°РїРёСЃРё РІ СЃС‚РѕР»Р±РёРє
+    fprintf(outputFile, "  %d\n", num1);
+    fprintf(outputFile, "Г— %d\n", num2);
+    fprintf(outputFile, "-----\n");
+    fprintf(outputFile, "  %d\n", num1 * num2);
+    fclose(outputFile);
+    printf("Р РµР·СѓР»СЊС‚Р°С‚ СѓРјРЅРѕР¶РµРЅРёСЏ Р·Р°РїРёСЃР°РЅ РІ С„Р°Р№Р»: %s\n", outputFilename);
 }
